@@ -1,0 +1,20 @@
+@CHARSET "UTF-8";
+
+form1{
+	
+}
+
+#form1 input.mini{width:50px;}
+#form1 input.short{width:200px;}
+#form1 input.middle{width:300px;}
+#form1 input.long{width:500px;}
+
+#form1 span.attention
+{
+	color:#FF0000;
+    font-weight:bold;	
+}
+
+#p2146-2-tbody tr:first-child {
+  display: none;
+}

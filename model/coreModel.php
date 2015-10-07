@@ -69,9 +69,8 @@ class coreModel
 
     public function deleteItem( $table, $where, $arrWhereVal )
     {
-        $sqlVal=array('del_flg'=>1);
+        $sqlVal=array('isDelete'=>1);
         $res = $this->objDb->update( $table, $sqlVal, $where, $arrWhereVal);
-        
         return $res;
     }
 

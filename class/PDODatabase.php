@@ -121,7 +121,7 @@ class PDODatabase{
                  .      $table
                  .      $whereSQL
                  .      $other;
-            
+
             return $sql;
         } 
 

@@ -9,17 +9,15 @@
 	<div id="container">
 		<div id="main_contents">
 			<table class="table  table-striped table-bordered table-hover" >
+				<input type="hidden" name="id" value="{$arrForm.id.value}" />
 				<tr>
 					<th>日報作成日</th>                   
-					<td><input type="text" id="datepicker" name="report_date" size="5" ></td>                              
+					<td><input type="text" id="datepicker" name="report_date" value="{$arrForm.report_date.value}" size="5"  ></td>                              
 				</tr>
 				<tr>
 					<p>ルーティン</p>
 					<dl>					
-					{foreach from=$arrRoutingContents key=key item=routine}
-						<dt><input type="checkbox" name="checked_routing[]" id="task_id_{$key}" value="{$key}" ></dt>
-						<dd><label for="task_id_{$key}">{$routine}</label></dd>
-					{/foreach}
+						{html_checkboxes name="checked_routing" options=$arrRoutingContents checked=$arrForm.checked_routing.value separator="<br />"}
 					</dl>	
 				</tr>
 				<tr>
@@ -32,37 +30,41 @@
 								<th>作業時間</th>
 								<th>追加/削除</th>
 							</tr>
-						
-							<tr class="task_row" id="task_row_1">
-								<td class=" classcategory_id1" id="td_classcategory_id1_1">
-									<select name="task_master_id[]"  style="" class="classcategory_id1" id="task_master_id_1">
-										{html_options options=$arrTaskContents selected=""} 
-									</select>
-								</td>
-								<td class="classcategory_id2" id="td_classcategory_id2_1">
-									<textarea id="contents_id_1" col="200"  rows="5" name="contents[]"></textarea>
-								</td>
-								<td class="work_time" id="td_work_time_id">
-									<input type="text" name="work_time[]" size="2" class="box_color" id="work_time_id_1">
-								</td>
-								<td class="_time" id="delete_button_id">
-								  <input type="button" id="delete_task_button_1" class="delete_task_button" name="delete_task" value="削除">
-								</td>
-							</tr>					
+							
+							{foreach  from=$arrForm.task_id.value key=n item=task}					
+								<tr class="task_row" id="task_row_{$n+1}" >
+									<td id="td_task_master_id_{$n+1}">
+										<select name="task_master_id[]"  style="" id="task_master_id_{$n+1}">
+											{html_options options=$arrTaskContents selected=$arrForm.task_master_id.value.$n} 
+										</select>
+										<input type="hidden" name="task_id[]" value="{$arrForm.task_id.value.$n}">
+									</td>
+									<td id="td_contents_id_{$n+1}">
+										<textarea id="contents_id_{$n+1}" col="200"  rows="5" name="contents[]">{$arrForm.contents.value.$n}</textarea>
+									</td>
+									<td class="work_time" id="td_work_time_id_{$n+1}">
+										<input type="text" name="work_time[]" size="2" id="work_time_id_{$n+1}" value="{$arrForm.work_time.value.$n}">
+									</td>
+									<td class="_time" id="delete_button_id">
+									  <input type="button" id="delete_task_button_{$n+1}" class="delete_task_button" name="delete_task" value="削除">
+									</td>
+								</tr>
+							{/foreach}	
+							
 						</table>
 						<input type="button" class="btn btn-success" value="パターンを追加する" id="addPattern"/>
 					</td>                              
 				</tr>
 				<tr>
 					<th rowspan="2" >食事</th>                   
-					<td><input type="text" name="calorie" size="3">kcal</td></tr>
+					<td><input type="text" name="calorie" size="3" value="{$arrForm.calorie.value}">kcal</td></tr>
 				</tr>
 				<tr>
-					<td><input type="text" name="weight" size="3">kg</td>
+					<td><input type="text" name="weight" size="3" value="{$arrForm.weight.value}" >kg</td>
 				</tr>
 				<tr>
 					<th>本日の反省</th>                   
-					<td><textarea name="reflection" col="200" rows="10"></textarea></td>                              
+					<td><textarea name="reflection" col="200" rows="10">{$arrForm.reflection.value}</textarea></td>                              
 				</tr>				
 			</table>
 		</div>	

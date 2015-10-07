@@ -6,6 +6,7 @@ require_once( dirname(__FILE__).'/require_class.php' );
 $param = (isset( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] !=='' )? $_SERVER['REQUEST_URI']:false;
 $params = array();
 
+
 if (  $param  !== false ) {
     // パラメーターを / で分割
     $params = explode( '/', $param );
@@ -40,7 +41,6 @@ $modelFile = $controller.'Model.php';
 
 // クラスファイル読込
 if ( !is_file( CONTROOL_DIR . $classFile ) ) {
-    echo "aa";
     echo "this controller does not exist";
     exit;
 }

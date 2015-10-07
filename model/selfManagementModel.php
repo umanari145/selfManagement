@@ -22,6 +22,7 @@ class selfManagementModel extends coreModel{
         $this->objFormParam->addParam('id','id');
         $this->objFormParam->addParam('日報作成日','report_date');
 		$this->objFormParam->addParam('ルーティン','checked_routing');		
+		$this->objFormParam->addParam('タスクid','task_id');		
 		$this->objFormParam->addParam('タスク名','task_master_id');
 		$this->objFormParam->addParam('作業内容','contents');
 		$this->objFormParam->addParam('作業時間','work_time');
@@ -55,12 +56,18 @@ class selfManagementModel extends coreModel{
 
     public function getSelfManagementDetail( $table, $col='*', $where, $arrVal)
     {
-         $SelfManagementDetail = $this->getItemDetail($table, $col, $where, $arrVal);
-         
-         if( $SelfManagementDetail !== false )
-         {
-             $this->convParamsFromDB( $SelfManagementDetail );
-             return $SelfManagementDetail;
+        $selfManagementDetail = $this->getItemDetail($table, $col, $where, $arrVal);
+		$arrTaskTable = $this->getItemDetail( " dtb_task_table " ," id as task_id , task_master_id , contents , work_time " ,' report_id= ? and isDelete = ?' , array($selfManagementDetail[0]['id'],0));
+		
+		if( $arrTaskTable !== false ){
+			$arrTaskTable = utility::sfSwapArray($arrTaskTable);
+			$selfManagementDetail[0]=array_merge( $selfManagementDetail[0], $arrTaskTable );
+		}
+		
+		if( $selfManagementDetail !== false )
+        {
+             $this->convParamsFromDB( $selfManagementDetail );
+             return $selfManagementDetail;
          }
          else
          {
@@ -68,15 +75,15 @@ class selfManagementModel extends coreModel{
          }
          
     }
+	
+	
 
     public function convParamsFromDB( &$arrParams )
     {
         foreach( $arrParams as $id => $params)
         {
-            $arrParams[$id]['skill_language'] =explode("_", $params['skill_language']);
-            $date = new DateTime( $params['birth_day']);
-            list($arrParams[$id]['birth_year'],$arrParams[$id]['birth_month'], $arrParams[$id]['birth_day']) =explode("-" ,$date->format('Y-n-j'));
-        }
+            if( isset($params['checked_routing']) ) $arrParams[$id]['checked_routing'] =explode("_", $params['checked_routing']);
+	    }
     }
 
     public function checkError()
@@ -111,25 +118,33 @@ class selfManagementModel extends coreModel{
             $where =' id = ? ';
             $arrWhereVal = array( $arrParams['id']);
             break;
-            case 'insert';
+		case 'insert';
         default:
             break;
         }
 
         $res1 = $this->registItem( $mode, "dtb_daily_report", $reportParams, $where, $arrWhereVal );
-		$report_id = $this->objDb->getLastId();
-		
+
 		if( $mode === "insert" ) {
+			$report_id = $this->objDb->getLastId();
+			
 			foreach( $taskParams as $no=>$params){
 					$taskParams[$no]["report_id"]= $report_id;
 			}
-		}
-
-		foreach( $taskParams as $param){
-			$res1 = $this->registItem( $mode, "dtb_task_table", $param, $where, $arrWhereVal );
+			
+		}elseif( $mode === 'update' ){
+			foreach( $taskParams as $no=>$params){
+					$taskParams[$no]["report_id"]= $arrParams['id'];
+			}
+			
+			$this->deleteItem( "dtb_task_table ", " report_id = ? ", array($arrParams['id']));
 		}
 		
-		echo ( $res === true )?'success!':'failed!';
+		foreach( $taskParams as $param){
+			$res2 = $this->registItem( "insert","dtb_task_table", $param, $where, $arrWhereVal );
+		}
+		
+		echo ( $res1 === true  && $res2 === true )?'success!':'failed!';
 
     }
 
@@ -153,7 +168,7 @@ class selfManagementModel extends coreModel{
 
 		$reportParams['checked_routing'] = implode("_",$reportParams['checked_routing']);		
 		//縦横の配列を変える
-		$taskParams = utility::sfSwapArray( $taskParams);	
+		 if ( isset( $taskParams) ) $taskParams = utility::sfSwapArray( $taskParams);	
 		return array( $reportParams , $taskParams );
 	}
 }

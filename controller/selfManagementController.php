@@ -38,17 +38,6 @@ class selfManagementController extends coreController{
 
     }
 
-    public function view( $id = '')
-    {
-        parent::view();
-        $id = $this->id;
-        $arrData = $this->model->getMemberDetail('dtb_member','*','member_id= ?' ,array( $id ));
-        $this->model->setParam( $arrData[0]);
-        $this->smarty->assign( 'arrForm', $this->model->getFormItemList() );
-        $this->render(__FUNCTION__);
-
-    }
-
     public function regist()
     {
         parent::regist();
@@ -83,7 +72,9 @@ class selfManagementController extends coreController{
     {
         parent::edit();
         $id = $this->id;
-        $arrData = $this->model->getMemberDetail('dtb_member','*','member_id= ?' ,array( $id ));
+		
+		$arrData = $this->model->getSelfManagementDetail( " dtb_daily_report " ," * " ,' id= ? and isDelete = ? ' ,array( $id,0 ));
+	
         $this->model->setParam( $arrData[0]);
         $this->smarty->assign( 'arrForm', $this->model->getFormItemList() );
         $this->render('regist');
